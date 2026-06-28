@@ -1,0 +1,35 @@
+# Dependencies
+/vendor/
+
+# Composer
+composer.phar
+
+# PHPUnit
+/.phpunit.cache/
+/.phpunit.result.cache
+
+# PHP CS Fixer
+/.php-cs-fixer.cache
+
+# PHPStan
+/var/cache/
+
+# Symfony cache & logs (wenn Bundle in einer App getestet wird)
+/var/
+/config/secrets/prod/prod.decrypt.private.php
+
+# Environment files
+.env.local
+.env.local.php
+.env.*.local
+
+# IDE
+/.idea/
+/.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Build artifacts
+/build/
+/coverage/

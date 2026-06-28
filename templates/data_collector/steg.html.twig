@@ -1,0 +1,111 @@
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% block toolbar %}
+    {% if collector.requestCount > 0 %}
+        {% set icon %}
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                <path d="M2 17l10 5 10-5"/>
+                <path d="M2 12l10 5 10-5"/>
+            </svg>
+            <span class="sf-toolbar-value">{{ collector.requestCount }}</span>
+        {% endset %}
+
+        {% set text %}
+            <div class="sf-toolbar-info-piece">
+                <b>Steg Requests</b>
+                <span>{{ collector.requestCount }}</span>
+            </div>
+            <div class="sf-toolbar-info-piece">
+                <b>Total Time</b>
+                <span>{{ collector.totalDurationMs }} ms</span>
+            </div>
+            <div class="sf-toolbar-info-piece">
+                <b>Tokens (prompt / completion)</b>
+                <span>{{ collector.totalPromptTokens }} / {{ collector.totalCompletionTokens }}</span>
+            </div>
+        {% endset %}
+
+        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url, status: '' }) }}
+    {% endif %}
+{% endblock %}
+
+{% block menu %}
+    <span class="label {{ collector.requestCount == 0 ? 'disabled' }}">
+        <span class="icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                <path d="M2 17l10 5 10-5"/>
+                <path d="M2 12l10 5 10-5"/>
+            </svg>
+        </span>
+        <strong>Steg</strong>
+        {% if collector.requestCount > 0 %}
+            <span class="count">
+                <span>{{ collector.requestCount }}</span>
+            </span>
+        {% endif %}
+    </span>
+{% endblock %}
+
+{% block panel %}
+    <h2>Steg — LLM Requests</h2>
+
+    {% if collector.requestCount == 0 %}
+        <div class="empty">
+            <p>No Steg requests were made during this request.</p>
+        </div>
+    {% else %}
+        <div class="metrics">
+            <div class="metric">
+                <span class="value">{{ collector.requestCount }}</span>
+                <span class="label">Requests</span>
+            </div>
+            <div class="metric">
+                <span class="value">{{ collector.totalDurationMs }} <span class="unit">ms</span></span>
+                <span class="label">Total Time</span>
+            </div>
+            <div class="metric">
+                <span class="value">{{ collector.totalPromptTokens }}</span>
+                <span class="label">Prompt Tokens</span>
+            </div>
+            <div class="metric">
+                <span class="value">{{ collector.totalCompletionTokens }}</span>
+                <span class="label">Completion Tokens</span>
+            </div>
+        </div>
+
+        <h3>Request Timeline</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Connection</th>
+                    <th>Model</th>
+                    <th>Duration</th>
+                    <th>Prompt Tokens</th>
+                    <th>Completion Tokens</th>
+                    <th>Response Preview</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for i, req in collector.requests %}
+                    <tr>
+                        <td>{{ i + 1 }}</td>
+                        <td><code>{{ req.connection }}</code></td>
+                        <td><code>{{ req.model }}</code></td>
+                        <td>{{ req.duration_ms }} ms</td>
+                        <td>{{ req.prompt_tokens }}</td>
+                        <td>{{ req.completion_tokens }}</td>
+                        <td>
+                            <span title="{{ req.response_preview }}">
+                                {{ req.response_preview|length > 80 ? req.response_preview|slice(0, 80) ~ '…' : req.response_preview }}
+                            </span>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+{% endblock %}
